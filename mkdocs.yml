@@ -1,0 +1,100 @@
+site_name: Agentic Document Parsing Wiki
+site_description: How LandingAI's Agentic Document Extraction (DPT-3) works, and how to build an equivalent pipeline for dense Korean slides with open-weight VLMs (Qwen and friends).
+site_url: https://swchoi1994.github.io/agentic-doc-parsing-wiki/
+repo_url: https://github.com/swchoi1994/agentic-doc-parsing-wiki
+repo_name: swchoi1994/agentic-doc-parsing-wiki
+edit_uri: edit/main/docs/
+copyright: Research notes, 2026. Not affiliated with LandingAI, Alibaba Qwen, or any model vendor.
+
+theme:
+  name: material
+  language: en
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/file-document-multiple-outline
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.action.edit
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search:
+      lang:
+        - en
+        - ko
+  - glightbox
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Guide:
+      - Home: index.md
+      - What LandingAI built: ade/overview.md
+      - The API contract: ade/api-contract.md
+      - How DPT-3 works: ade/how-dpt3-works.md
+      - What REA revealed: ade/rea-findings.md
+  - Build:
+      - Korean slides pipeline: build/pipeline.md
+      - Model candidates: build/models.md
+      - Embeddings and retrieval: build/embeddings.md
+      - Hardware and serving: build/hardware.md
+      - Evaluation recipe: build/evaluation.md
+  - Research:
+      - How others solved it: research/survey.md
+      - Korean benchmarks and models: research/korean.md
+  - Changelog: changelog.md
