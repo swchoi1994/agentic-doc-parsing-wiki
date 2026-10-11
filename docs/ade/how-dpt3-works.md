@@ -39,16 +39,18 @@ The solid path is what the Parse API does. The dotted path is the two follow-on 
 
 ## Stage by stage
 
-### 1. Input normalisation <span class="ev ev-doc">Documented</span>
+### 1. Input normalisation
 
+<span class="ev ev-doc">Documented</span>
 Parse accepts PDFs, images, and modern Office files (DOCX, PPTX, ODT, RTF). "Office files are converted to PDF before parsing; the conversion can change layout and page count, and page-based limits and credits apply to the converted PDF's page count." Spreadsheets and legacy DOC/PPT are Gen1-only. Password-protected PDFs are rejected with HTTP 422 in Gen2.
 
 Sources: [Supported file types](https://docs.landing.ai/dpt3/file-types), the [ADE agent skill](https://github.com/landing-ai/ade-document-processing-skills/blob/main/plugins/ade-document-processing/skills/document-extraction/SKILL.md).
 
 For a slide pipeline this matters: **ADE never sees the PPTX text layer**. It rasterises the deck and reads pixels. That is a property we can beat, not merely match (see the [pipeline](../build/pipeline.md#stage-1-render-and-harvest)).
 
-### 2. Layout detection and block ontology <span class="ev ev-doc">Documented</span>
+### 2. Layout detection and block ontology
 
+<span class="ev ev-doc">Documented</span>
 "A Document Pre-Trained Transformer (DPT) is the model that powers the Parse API. The model identifies a document's layout, transcribes the content into Markdown in reading order, and records where every block sits on the page." The Gen1 docs describe DPT-2 the same way: "identifies document layouts and chunks, then generates descriptive explanations (captions) for those chunks."
 
 The block ontology is fixed and enumerated in the OpenAPI spec: `text`, `table`, `table_cell`, `figure`, `marginalia`, `attestation`, `logo`, `card`, `scan_code`. Each block gets an id `<type>-<index>` assigned in reading order, a page number, a `[start, end)` range into the markdown, and a box in normalised page coordinates. Pages whose layout pass fails are returned with `status: failed` and an empty child list, which tells you layout is a per-page operation with its own failure mode.
@@ -61,8 +63,9 @@ Sources: [Parsing models](https://docs.landing.ai/dpt3/parse-models), [Parse API
 
 <span class="ev ev-unk">Unknown</span> The detector architecture, its training data, and whether reading order is predicted by the detector or by a separate ordering model.
 
-### 3. Per-block reading: two engines behind one endpoint <span class="ev ev-doc">Documented</span>
+### 3. Per-block reading: two engines behind one endpoint
 
+<span class="ev ev-doc">Documented</span>
 This is the most informative part of the public record. The OpenAPI description of the `model` field reads:
 
 > Two families are available: `dpt-3-pro` for highest quality, and `dpt-3-verity` for lower-latency parsing **without vision-model captioning**.
@@ -92,8 +95,9 @@ Sources: [OpenAPI spec](https://docs.landing.ai/dpt3/openapi-adev2.json), [Parsi
 
 <span class="ev ev-imp">Implied</span> "Captioning" is LandingAI's word for generating a block's markdown, including text blocks. The Playground's Config menu lets you "choose which element types to caption," and the Gen2 options expose `blocks.<type>.markdown: false` per block type, which "suppresses" that type's markdown and empties its `atomic_grounding`. If the markdown of a text block can be switched off per type without affecting the layout tree, the layout tree is produced first and the markdown is generated afterwards, block by block.
 
-### 4. The table path <span class="ev ev-doc">Documented</span>
+### 4. The table path
 
+<span class="ev ev-doc">Documented</span>
 The DPT-2 table blog is the only place LandingAI describes an internal algorithm:
 
 1. **Structure prediction.** "DPT-2 first maps the table's layout, finding where rows, columns, and merged cells begin and end."
@@ -107,8 +111,9 @@ Sources: [Breakthrough table extraction with DPT-2](https://landing.ai/blog/brea
 
 <span class="ev ev-imp">Implied</span> This is the one concrete instance of the "decompose into bounded subtasks" behaviour that the marketing calls agentic: a structure model proposes a grid, the grid is cut into regions small enough for the reader to get right, the reader runs on each region, and the results are stitched back with their boxes. The same recipe is what the open-source literature calls *decomposition repair* ([research survey](../research/survey.md#agentic-repair-loops)).
 
-### 5. Markdown assembly and grounding <span class="ev ev-doc">Documented</span>
+### 5. Markdown assembly and grounding
 
+<span class="ev ev-doc">Documented</span>
 The response is one markdown string in reading order plus a tree. Every node's `grounding.range` is a code-point offset into that one string, pages are separated by `<!-- PAGE BREAK -->`, figures become `<figure type="CHART">` elements whose generated text sits inside `<description>` tags, and the last line is `<!-- doc_id=<job_id> -->` so that Extract can link back to the parse job.
 
 Ranges are "stable within a response but not across re-parses of the same document," and the skill file warns that "ranges shift between parses, even of the same file." Billing is "by output characters returned, not by page."
@@ -117,8 +122,9 @@ Sources: [Parse API response](https://docs.landing.ai/dpt3/parse-response), [Int
 
 <span class="ev ev-imp">Implied</span> Non-deterministic ranges across re-parses of the same file are what you get from a generative reader, not from an OCR engine. Billing by output characters is what you do when your cost is dominated by decoder tokens. Both point the same way as stage 3.
 
-### 6. Extract and Ground are separate models <span class="ev ev-doc">Documented</span>
+### 6. Extract and Ground are separate models
 
+<span class="ev ev-doc">Documented</span>
 Extract takes **markdown from any source** plus a JSON Schema whose field descriptions "guide the extraction, so treat them as prompts." It has its own snapshot line (`extract-latest`, `extract-20260903`), its own billing basis (input markdown characters plus output extraction characters), returns `null` for fields it cannot find and `ranges: null` for values it "synthesized." Ground is "always synchronous, consumes no credits," and maps ranges to the blocks they overlap; a mismatched parse/extract pair "returns 200 with plausible boxes that land on the wrong content."
 
 Sources: [Extract](https://docs.landing.ai/dpt3/extract), [Ground](https://docs.landing.ai/dpt3/ground), [OpenAPI spec](https://docs.landing.ai/dpt3/openapi-adev2.json).
@@ -127,8 +133,9 @@ Sources: [Extract](https://docs.landing.ai/dpt3/extract), [Ground](https://docs.
 
 Source: [ade-docvqa-benchmark](https://github.com/landing-ai/ade-docvqa-benchmark).
 
-### 7. Third-party models inside DPT <span class="ev ev-doc">Documented</span>
+### 7. Third-party models inside DPT
 
+<span class="ev ev-doc">Documented</span>
 Two changelog entries are unusually candid:
 
 - **September 11, 2026.** "New snapshots of DPT-2, ADE Extract, and ADE Split run on an updated underlying model. One of our third-party model providers is retiring the model that earlier snapshots use." The replacement snapshot `dpt-2-20260903` "does not return confidence scores. The `confidence` field in the Parse response is `null`."

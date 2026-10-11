@@ -128,7 +128,9 @@
 .hero h1 { font-size: 2.6rem; line-height: 1.08; max-width: 18ch; }
 .hero .lead { max-width: 60ch; }
 .hero-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 1rem 0 0.5rem 0; }
-.md-typeset .md-button { border-radius: 999px; font-weight: 600; font-size: 0.74rem; padding: 0.45em 1.1em; border-color: var(--w-border); }
+.md-typeset .md-button { border-radius: 999px; font-weight: 600; font-size: 0.74rem; padding: 0.45em 1.1em; border-color: var(--w-border); color: var(--md-default-fg-color); text-decoration: none; }
+.md-typeset .md-button:not(.md-button--primary):hover { border-color: var(--w-lime); color: var(--w-lime); background: transparent; }
+[data-md-color-scheme="default"] .md-typeset .md-button:not(.md-button--primary):hover { border-color: var(--w-green); color: var(--w-green); }
 .md-typeset .md-button--primary { background: var(--w-lime); color: #0b0d0c !important; border-color: var(--w-lime); }
 [data-md-color-scheme="default"] .md-typeset .md-button--primary { background: var(--w-green); color: #fff !important; border-color: var(--w-green); }
 .md-typeset .md-button:hover { opacity: 0.9; }
