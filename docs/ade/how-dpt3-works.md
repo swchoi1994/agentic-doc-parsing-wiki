@@ -19,7 +19,7 @@ An evidence-graded reconstruction of LandingAI's Document Pre-trained Transforme
 ## The pipeline in one picture
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Document<br/>PDF, image, DOCX, PPTX] --> B[Page rendering<br/>Office files converted to PDF first]
     B --> C[Layout model<br/>blocks + types + reading order]
     C --> D{Model family}
