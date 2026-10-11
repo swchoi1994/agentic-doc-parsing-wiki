@@ -38,7 +38,7 @@ flowchart LR
 
 <ol class="stages" markdown>
 
-<li markdown>
+<li markdown id="stage-1-render-and-harvest">
 **Render and harvest.** Convert PPTX to PDF once per deck with LibreOffice, rasterise each page at 200 DPI (about 2200 px wide for 16:9, enough for 8 pt Hangul), and keep three things ADE throws away: the PDF text layer with span boxes, the slide titles, and the speaker notes from the PPTX XML. For digitally authored decks the text layer is exact and costs nothing. Scanned decks have none of it and fall through to the VLM. Code: `render.py`.
 </li>
 
@@ -139,6 +139,8 @@ Outputs: `parse-response.json` (ADE shape), `parse-output.md`, `pages/*.png`, `c
 
 ## What this does not do yet
 
+- The shipped `run.py` asks the VLM for layout on scanned and dense pages only; digital pages use the text layer for text and run the VLM layout pass at the default resolution just to find tables and figures. A convolutional detector backend is the first swap to make for the five-second budget on scanned decks.
+- There is no OCR-engine reader in the code yet (the Verity-style path with per-word confidence); text comes from the text layer or the VLM.
 - Per-cell boxes inside tables: cells carry the table's box. A cell-level detector (or PaddleOCR's table structure model) would give ADE's `table_cell` grounding.
 - Word-level grounding with confidence: only an OCR-engine reader (PaddleOCR text recognition, or a Verity-style model) can supply it; the VLM path grounds at block level.
 - Automatic Pro/Verity-style routing per page is a heuristic (text layer + ink density). A trained page classifier is the next step; see the semantic-router note on the [hardware page](hardware.md).

@@ -45,6 +45,9 @@ theme:
     - content.tabs.link
     - content.action.edit
 
+validation:
+  anchors: warn
+
 extra_css:
   - stylesheets/extra.css
 

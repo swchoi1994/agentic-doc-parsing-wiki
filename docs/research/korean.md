@@ -48,5 +48,5 @@ If you fine-tune anything for Korean decks (the parser, the embedder, or the rer
 - **Normalise to NFC** before any comparison. Hangul syllables can appear as precomposed (NFC) or as jamo sequences (NFD, common in files that passed through macOS); CER on unnormalised text punishes the model for a representation difference.
 - **Spacing (띄어쓰기) is content**, not formatting. Korean word spacing changes meaning and is frequently inconsistent in slides; the prompts in this pipeline tell the model to keep the original spacing, and the verifier compares against the text layer rather than "correcting" it.
 - **Mixed scripts on one line.** Hangul, Hanja, Latin acronyms and digits with units (억 원, %, bp) sit together; tokenisation and resolution both matter, and the figure prompt asks for units explicitly.
-- **Vertical and rotated text** appears in table headers and chart axes; the layout detector's rotated-box support (DocLayout-YOLO has it) is worth checking on your set.
+- **Vertical and rotated text** appears in table headers and chart axes; check whether your layout detector handles rotated boxes before trusting its table headers.
 - **Fonts.** Thin sans-serif Korean fonts at 8 pt lose strokes at 150 DPI; render at 200 DPI or higher, and crop-read dense blocks at native resolution.

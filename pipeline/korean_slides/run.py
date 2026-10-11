@@ -10,7 +10,7 @@ from .assemble import assemble
 from .context import ContextBuilder
 from .read import ReaderConfig, VLMReader
 from .render import render
-from .route import PagePlan, plan_page, projection_split, MAX_PIXELS_DENSE, Block
+from .route import PagePlan, plan_page, projection_split, classify, MAX_PIXELS_DEFAULT, MAX_PIXELS_DENSE, Block
 from .verify import check_block, decide
 
 
@@ -37,7 +37,9 @@ def main() -> None:
     for a in assets:
         t0 = time.time()
         try:
-            html = reader.layout(a.image_path, MAX_PIXELS_DENSE)
+            page_class, _reader, _mp = classify(a)          # decision layer first, layout second
+            # digital pages only need coarse regions for tables/figures: default resolution is enough
+            html = reader.layout(a.image_path, MAX_PIXELS_DEFAULT if page_class == "digital" else MAX_PIXELS_DENSE)
             t_layout = time.time()
             plan = plan_page(a, html)
             reader.read_plan(a.image_path, plan)
